@@ -1,7 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
+import MatchSlice from './slices/MatchSlice'
 
 const store = configureStore({
-	reducer: {},
+	reducer: {
+		match: MatchSlice
+	},
 })
 
 export type RootState = ReturnType<typeof store.getState>
