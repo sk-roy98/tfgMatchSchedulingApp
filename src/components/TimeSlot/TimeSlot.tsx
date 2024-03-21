@@ -9,33 +9,41 @@ interface TimeSlotInputProps {
 	date: Date
 	onTimeSlotAdded: (timeSlot: MatchSlot) => void
 	existingSlots: MatchSlot[]
+	// onTimeSlotComplete: (date: Date) => void
 }
 
 const TimeSlotInput = ({
 	date,
 	onTimeSlotAdded,
 	existingSlots,
-}: TimeSlotInputProps) => {
+}: // onTimeSlotComplete,
+TimeSlotInputProps) => {
 	const [showStartTimePicker, setShowStartTimePicker] = useState(false)
 	const [showEndTimePicker, setShowEndTimePicker] = useState(false)
 	const [startTime, setStartTime] = useState(new Date())
 	const [endTime, setEndTime] = useState(new Date())
 
+	console.log(startTime, 'startTime', startTime.toISOString())
 	const handleStartTimeChange = (
 		event: any,
-		selectedDate: Date | undefined
+		selectedTime: Date | undefined
 	) => {
-    console.log()
 		setShowStartTimePicker(false)
-		if (selectedDate) {
-			setStartTime(selectedDate)
+		if (selectedTime) {
+			const newStartTime = new Date(date)
+			newStartTime.setHours(selectedTime.getHours())
+			newStartTime.setMinutes(selectedTime.getMinutes())
+			setStartTime(newStartTime)
 		}
 	}
 
-	const handleEndTimeChange = (event: any, selectedDate: Date | undefined) => {
+	const handleEndTimeChange = (event: any, selectedTime: Date | undefined) => {
 		setShowEndTimePicker(false)
-		if (selectedDate) {
-			setEndTime(selectedDate)
+		if (selectedTime) {
+			const newEndTime = new Date(date)
+			newEndTime.setHours(selectedTime.getHours())
+			newEndTime.setMinutes(selectedTime.getMinutes())
+			setEndTime(newEndTime)
 		}
 	}
 
@@ -49,14 +57,18 @@ const TimeSlotInput = ({
 
 		const overlappingSlot = existingSlots.find(
 			(slot) =>
-				(slot.startTime >= startTime && slot.startTime < endTime) ||
-				(slot.endTime > startTime && slot.endTime <= endTime)
+				(slot.startTime.getTime() >= startTime.getTime() &&
+					slot.startTime.getTime() < endTime.getTime()) ||
+				(slot.endTime.getTime() > startTime.getTime() &&
+					slot.endTime.getTime() <= endTime.getTime())
 		)
-
+		console.log(newSlot.startTime.toISOString())
 		if (overlappingSlot) {
+			console.log(overlappingSlot, 'overlap')
 			alert('time slot overlaps with an existing slot')
 		} else {
 			onTimeSlotAdded(newSlot)
+			// onTimeSlotComplete(date)
 			setStartTime(new Date())
 			setEndTime(new Date())
 		}

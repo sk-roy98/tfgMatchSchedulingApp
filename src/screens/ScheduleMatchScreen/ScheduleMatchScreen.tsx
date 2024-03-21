@@ -9,6 +9,7 @@ import { RootState } from '../../store/store'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { MatchSlot } from '../../utils/types'
 import { addMatchSlot } from '../../store/slices/MatchSlice'
+import { isSameDay } from 'date-fns'
 
 interface ScheduleMatchScreenProps {
 	navigation: any
@@ -22,7 +23,21 @@ const ScheduleMatchScreen = ({ navigation }: ScheduleMatchScreenProps) => {
 
 	const handleActionSelected = (newAction: string) => {
 		setAction(newAction)
+		retrieveData()
 	}
+
+	const retrieveData = async () => {
+		try {
+			const value = await AsyncStorage.getItem('matchSchedule')
+			if (value !== null) {
+				console.log(value, 'async')
+			}
+		} catch (error) {
+			console.error(error)
+		}
+	}
+
+	
 
 	console.log(selectedDates, 'main component')
 
@@ -38,9 +53,10 @@ const ScheduleMatchScreen = ({ navigation }: ScheduleMatchScreenProps) => {
 		}
 	}
 
-	const handleTimeSlotAdded = (timeSlot: MatchSlot) => {
+	const handleTimeSlotAdded = async (timeSlot: MatchSlot) => {
+		const newSchedule = [...schedule, timeSlot]
 		dispatch(addMatchSlot(timeSlot))
-		saveSchedule(schedule)
+		await saveSchedule(newSchedule)
 	}
 
 	return (
@@ -90,6 +106,11 @@ const ScheduleMatchScreen = ({ navigation }: ScheduleMatchScreenProps) => {
 									console.log(slot, 'slot')
 									slot.date.toDateString() === item.toDateString()
 								})}
+								// onTimeSlotComplete={(date) => {
+								// 	setSelectedDates((prevDates) =>
+								// 		prevDates.filter((d) => !isSameDay(d, date))
+								// 	)
+								// }}
 							/>
 						)}
 						keyExtractor={(item) => item.toDateString()}
